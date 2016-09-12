@@ -1,6 +1,7 @@
 package info.krushik.android.json;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,8 +14,15 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
+
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,6 +48,17 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Create default options which will be used for every
+        //  displayImage(...) call if no options will be passed to this method
+        DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
+                .cacheInMemory(true)
+                .cacheOnDisk(true)
+                .build();
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext())
+                .defaultDisplayImageOptions(defaultOptions)
+                .build();
+        ImageLoader.getInstance().init(config); // Do it on Application start
 
         lvMovies = (ListView) findViewById(R.id.lvMovies);
 
@@ -131,11 +150,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public class MovieAdapter extends ArrayAdapter{
+    public class MovieAdapter extends ArrayAdapter {
 
         private List<MovieModel> movieModelList;
         private int resource;
         private LayoutInflater inflater;
+
         public MovieAdapter(Context context, int resource, List<MovieModel> objects) {
             super(context, resource, objects);
             movieModelList = objects;
@@ -147,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
 
-            if(convertView == null){
+            if (convertView == null) {
                 convertView = inflater.inflate(resource, null);
             }
 
@@ -160,6 +180,7 @@ public class MainActivity extends AppCompatActivity {
             RatingBar rbMovieRating;
             TextView tvCast;
             TextView tvStory;
+            final ProgressBar progressBar;
 
             ivMovieIcon = (ImageView) convertView.findViewById(R.id.ivIcon);
             tvMovie = (TextView) convertView.findViewById(R.id.tvMovie);
@@ -170,19 +191,42 @@ public class MainActivity extends AppCompatActivity {
             rbMovieRating = (RatingBar) convertView.findViewById(R.id.rbMovie);
             tvCast = (TextView) convertView.findViewById(R.id.tvCast);
             tvStory = (TextView) convertView.findViewById(R.id.tvStory);
+            progressBar = (ProgressBar) convertView.findViewById(R.id.progressBar);
+
+            // Then later, when you want to display image
+            ImageLoader.getInstance().displayImage(movieModelList.get(position).getImage(), ivMovieIcon, new ImageLoadingListener() {
+                @Override
+                public void onLoadingStarted(String imageUri, View view) {
+                    progressBar.set
+                }
+
+                @Override
+                public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+
+                }
+
+                @Override
+                public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+
+                }
+
+                @Override
+                public void onLoadingCancelled(String imageUri, View view) {
+
+                }
+            });
 
             tvMovie.setText(movieModelList.get(position).getMovie());
-
             tvTagline.setText(movieModelList.get(position).getTagline());
             tvYear.setText("Year: " + movieModelList.get(position).getYear());
             tvDuration.setText("Duration: " + movieModelList.get(position).getDuration());
             tvDirector.setText("Director: " + movieModelList.get(position).getDirector());
 
             // rating bar
-            rbMovieRating.setRating(movieModelList.get(position).getRaiting()/2);
+            rbMovieRating.setRating(movieModelList.get(position).getRaiting() / 2);
 
             StringBuffer stringBuffer = new StringBuffer();
-            for (MovieModel.Cast cast :movieModelList.get(position).getCastList()){
+            for (MovieModel.Cast cast : movieModelList.get(position).getCastList()) {
                 stringBuffer.append(cast.getName() + ", ");
             }
 
@@ -203,7 +247,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_refresh){
+        if (id == R.id.action_refresh) {
             new JSONTask().execute("http://jsonparsing.parseapp.com/jsonData/moviesData.txt");
             return true;
         }
