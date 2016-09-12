@@ -180,7 +180,6 @@ public class MainActivity extends AppCompatActivity {
             RatingBar rbMovieRating;
             TextView tvCast;
             TextView tvStory;
-            final ProgressBar progressBar;
 
             ivMovieIcon = (ImageView) convertView.findViewById(R.id.ivIcon);
             tvMovie = (TextView) convertView.findViewById(R.id.tvMovie);
@@ -191,28 +190,28 @@ public class MainActivity extends AppCompatActivity {
             rbMovieRating = (RatingBar) convertView.findViewById(R.id.rbMovie);
             tvCast = (TextView) convertView.findViewById(R.id.tvCast);
             tvStory = (TextView) convertView.findViewById(R.id.tvStory);
-            progressBar = (ProgressBar) convertView.findViewById(R.id.progressBar);
+            final ProgressBar progressBar = (ProgressBar) convertView.findViewById(R.id.progressBar);
 
             // Then later, when you want to display image
             ImageLoader.getInstance().displayImage(movieModelList.get(position).getImage(), ivMovieIcon, new ImageLoadingListener() {
                 @Override
                 public void onLoadingStarted(String imageUri, View view) {
-                    progressBar.set
+                    progressBar.setVisibility(View.VISIBLE);
                 }
 
                 @Override
                 public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
-
+                    progressBar.setVisibility(View.GONE);
                 }
 
                 @Override
                 public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-
+                    progressBar.setVisibility(View.GONE);
                 }
 
                 @Override
                 public void onLoadingCancelled(String imageUri, View view) {
-
+                    progressBar.setVisibility(View.GONE);
                 }
             });
 
