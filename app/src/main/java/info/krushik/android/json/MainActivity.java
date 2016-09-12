@@ -167,33 +167,32 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
 
+            ViewHolder holder = null;
+
             if (convertView == null) {
+                holder = new ViewHolder();
                 convertView = inflater.inflate(resource, null);
+                holder.ivMovieIcon = (ImageView) convertView.findViewById(R.id.ivIcon);
+                holder.tvMovie = (TextView) convertView.findViewById(R.id.tvMovie);
+                holder.tvTagline = (TextView) convertView.findViewById(R.id.tvTagline);
+                holder.tvYear = (TextView) convertView.findViewById(R.id.tvYear);
+                holder.tvDuration = (TextView) convertView.findViewById(R.id.tvDuration);
+                holder.tvDirector = (TextView) convertView.findViewById(R.id.tvDirector);
+                holder.rbMovieRating = (RatingBar) convertView.findViewById(R.id.rbMovie);
+                holder.tvCast = (TextView) convertView.findViewById(R.id.tvCast);
+                holder.tvStory = (TextView) convertView.findViewById(R.id.tvStory);
+                convertView.setTag(holder);
+            }else {
+                holder = (ViewHolder) convertView.getTag();
             }
 
-            ImageView ivMovieIcon;
-            TextView tvMovie;
-            TextView tvTagline;
-            TextView tvYear;
-            TextView tvDuration;
-            TextView tvDirector;
-            RatingBar rbMovieRating;
-            TextView tvCast;
-            TextView tvStory;
 
-            ivMovieIcon = (ImageView) convertView.findViewById(R.id.ivIcon);
-            tvMovie = (TextView) convertView.findViewById(R.id.tvMovie);
-            tvTagline = (TextView) convertView.findViewById(R.id.tvTagline);
-            tvYear = (TextView) convertView.findViewById(R.id.tvYear);
-            tvDuration = (TextView) convertView.findViewById(R.id.tvDuration);
-            tvDirector = (TextView) convertView.findViewById(R.id.tvDirector);
-            rbMovieRating = (RatingBar) convertView.findViewById(R.id.rbMovie);
-            tvCast = (TextView) convertView.findViewById(R.id.tvCast);
-            tvStory = (TextView) convertView.findViewById(R.id.tvStory);
+
+
             final ProgressBar progressBar = (ProgressBar) convertView.findViewById(R.id.progressBar);
 
             // Then later, when you want to display image
-            ImageLoader.getInstance().displayImage(movieModelList.get(position).getImage(), ivMovieIcon, new ImageLoadingListener() {
+            ImageLoader.getInstance().displayImage(movieModelList.get(position).getImage(), holder.ivMovieIcon, new ImageLoadingListener() {
                 @Override
                 public void onLoadingStarted(String imageUri, View view) {
                     progressBar.setVisibility(View.VISIBLE);
@@ -215,25 +214,37 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
-            tvMovie.setText(movieModelList.get(position).getMovie());
-            tvTagline.setText(movieModelList.get(position).getTagline());
-            tvYear.setText("Year: " + movieModelList.get(position).getYear());
-            tvDuration.setText("Duration: " + movieModelList.get(position).getDuration());
-            tvDirector.setText("Director: " + movieModelList.get(position).getDirector());
+            holder.tvMovie.setText(movieModelList.get(position).getMovie());
+            holder.tvTagline.setText(movieModelList.get(position).getTagline());
+            holder.tvYear.setText("Year: " + movieModelList.get(position).getYear());
+            holder.tvDuration.setText("Duration: " + movieModelList.get(position).getDuration());
+            holder.tvDirector.setText("Director: " + movieModelList.get(position).getDirector());
 
             // rating bar
-            rbMovieRating.setRating(movieModelList.get(position).getRaiting() / 2);
+            holder.rbMovieRating.setRating(movieModelList.get(position).getRaiting() / 2);
 
             StringBuffer stringBuffer = new StringBuffer();
             for (MovieModel.Cast cast : movieModelList.get(position).getCastList()) {
                 stringBuffer.append(cast.getName() + ", ");
             }
 
-            tvCast.setText("Cast: " + stringBuffer);
-            tvStory.setText(movieModelList.get(position).getStory());
+            holder.tvCast.setText("Cast: " + stringBuffer);
+            holder.tvStory.setText(movieModelList.get(position).getStory());
 
 
             return convertView;
+        }
+
+        class ViewHolder {
+            private ImageView ivMovieIcon;
+            private TextView tvMovie;
+            private TextView tvTagline;
+            private TextView tvYear;
+            private TextView tvDuration;
+            private TextView tvDirector;
+            private RatingBar rbMovieRating;
+            private TextView tvCast;
+            private TextView tvStory;
         }
     }
 
