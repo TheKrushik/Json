@@ -1,13 +1,19 @@
 package info.krushik.android.json;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -117,11 +123,76 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(List<MovieModel> result) {
             super.onPostExecute(result);
+
+            MovieAdapter adapter = new MovieAdapter(getApplicationContext(), R.layout.row, result);
+            lvMovies.setAdapter(adapter);
             // TODO need to set data to the list
         }
     }
 
 
+    public class MovieAdapter extends ArrayAdapter{
+
+        private List<MovieModel> movieModelList;
+        private int resource;
+        private LayoutInflater inflater;
+        public MovieAdapter(Context context, int resource, List<MovieModel> objects) {
+            super(context, resource, objects);
+            movieModelList = objects;
+            this.resource = resource;
+            inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            if(convertView == null){
+                convertView = inflater.inflate(resource, null);
+            }
+
+            ImageView ivMovieIcon;
+            TextView tvMovie;
+            TextView tvTagline;
+            TextView tvYear;
+            TextView tvDuration;
+            TextView tvDirector;
+            RatingBar rbMovieRating;
+            TextView tvCast;
+            TextView tvStory;
+
+            ivMovieIcon = (ImageView) convertView.findViewById(R.id.ivIcon);
+            tvMovie = (TextView) convertView.findViewById(R.id.tvMovie);
+            tvTagline = (TextView) convertView.findViewById(R.id.tvTagline);
+            tvYear = (TextView) convertView.findViewById(R.id.tvYear);
+            tvDuration = (TextView) convertView.findViewById(R.id.tvDuration);
+            tvDirector = (TextView) convertView.findViewById(R.id.tvDirector);
+            rbMovieRating = (RatingBar) convertView.findViewById(R.id.rbMovie);
+            tvCast = (TextView) convertView.findViewById(R.id.tvCast);
+            tvStory = (TextView) convertView.findViewById(R.id.tvStory);
+
+            tvMovie.setText(movieModelList.get(position).getMovie());
+
+            tvTagline.setText(movieModelList.get(position).getTagline());
+            tvYear.setText("Year: " + movieModelList.get(position).getYear());
+            tvDuration.setText("Duration: " + movieModelList.get(position).getDuration());
+            tvDirector.setText("Director: " + movieModelList.get(position).getDirector());
+
+            // rating bar
+            rbMovieRating.setRating(movieModelList.get(position).getRaiting()/2);
+
+            StringBuffer stringBuffer = new StringBuffer();
+            for (MovieModel.Cast cast :movieModelList.get(position).getCastList()){
+                stringBuffer.append(cast.getName() + ", ");
+            }
+
+            tvCast.setText("Cast: " + stringBuffer);
+            tvStory.setText(movieModelList.get(position).getStory());
+
+
+            return convertView;
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
