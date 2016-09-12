@@ -1,5 +1,6 @@
 package info.krushik.android.json;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -43,12 +44,17 @@ import info.krushik.android.json.models.MovieModel;
 public class MainActivity extends AppCompatActivity {
 
     private ListView lvMovies;
+    private ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        dialog = new ProgressDialog(this);
+        dialog.setIndeterminate(true);
+        dialog.setCancelable(false);
+        dialog.setMessage("Loading. Please wait...");
         // Create default options which will be used for every
         //  displayImage(...) call if no options will be passed to this method
         DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
@@ -67,6 +73,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public class JSONTask extends AsyncTask<String, String, List<MovieModel>> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dialog.show();
+        }
 
         @Override
         protected List<MovieModel> doInBackground(String... params) {
@@ -142,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(List<MovieModel> result) {
             super.onPostExecute(result);
-
+            dialog.dismiss();
             MovieAdapter adapter = new MovieAdapter(getApplicationContext(), R.layout.row, result);
             lvMovies.setAdapter(adapter);
             // TODO need to set data to the list
